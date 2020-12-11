@@ -12,6 +12,13 @@ def main():
         print("Too few arguments!")
         return
 
+    serverIP = sys.argv[1]
+    serverUDPListenPort = sys.argv[2]
+    serverTCPListenPort = sys.argv[3]
+    clientUDPSenderPort = sys.argv[4]
+    clientTCPSenderPort = sys.argv[5]
+    TCP(serverIP, serverTCPListenPort)
+
 
 def UDP():
     serverName = 'hostName'
@@ -56,11 +63,3 @@ def TCP(serverIP, serverPort):
 
 
 main()
-serverIP = sys.argv[1]
-serverUDPListenPort = sys.argv[2]
-serverTCPListenPort = sys.argv[3]
-clientUDPSenderPort = sys.argv[4]
-clientTCPSenderPort = sys.argv[5]
-TCP(serverIP, serverTCPListenPort)
-
-print(serverIP, serverUDPListenPort, serverTCPListenPort, clientUDPSenderPort, clientTCPSenderPort)
