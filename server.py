@@ -8,16 +8,15 @@ def main():
         print("Too few arguments!")
         return
 
-    UDPListenPort = sys.arg[1]
-    TCPListenPort = sys.arg[2]
-    TCP()
-    UDP()
+    UDPListenPort = sys.argv[1]
+    TCPListenPort = sys.argv[2]
+    TCP(TCPListenPort)
 
 
 def UDP():
     serverPort = 12000
     serverSocket = socket(AF_INET, SOCK_DGRAM)
-    serverSocket.bind((", serverPort))
+    serverSocket.bind(("", serverPort))
     print("The server is ready to revieve")
     while True:
         message, clientAddress = serverSocket.recvfrom(2048)
@@ -26,14 +25,14 @@ def UDP():
     return
 
 
-def TCP():
+def TCP(serverPort):
     # TCP Server
-    serverPort = 12000
     serverSocket = socket(AF_INET, SOCK_STREAM)
-    serverSocket.bind(("", serverPort))
+    serverPort = int(serverPort)
+    serverSocket.bind(('', serverPort))
     # enter listening mode
     serverSocket.listen(1)
-    print 'The server is ready to receive'
+    print('The server is ready to receive...')
     # wait for message
     while True:
         # wait until a client connects

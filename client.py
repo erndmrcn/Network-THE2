@@ -28,7 +28,7 @@ def UDP():
     # soc_dgram -> datagram -> means UDP
     clientSocket = socket(AF_INET, SOCK_DGRAM)
     # for this application we send input from stdin
-    message = raw_input('Input lowercase sentence:')
+    message = input('Input lowercase sentence:')
     clientSocket.sendto(message.encode(), (serverName, serverPort))
     # servername yo IP done in sendto by calling DNS
     modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
@@ -39,9 +39,9 @@ def UDP():
 
 
 def TCP(serverIP, serverPort):
-    with open("transfer_file_TCP.txt", "rb") as f:
-        while bytearray := f.read(1000):
-            print(bytearray)
+    # with open("transfer_file_TCP.txt", "rb") as f:
+    #     while bytearray := f.read(1000):
+    #         print(bytearray)
 
     # TCP Client
 
@@ -51,7 +51,7 @@ def TCP(serverIP, serverPort):
     # handshaking
     serverPort = int(serverPort)
     clientSocket.connect((serverIP, serverPort))
-    sentence = raw_input('Input lowercase sentence:')
+    sentence = input('Input lowercase sentence:')
     # since connection is already established instead
     # of sendto this time send
     # send 10 bytearray
