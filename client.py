@@ -1,10 +1,9 @@
-# A Simple Server-Client Application for tutorial
-# UDP Client
 # import socket lib
 from socket import *
 import sys
 # get input for server name and port#
 # do not forget to put 1 sec time limitation
+SEGMENT_SIZE = 101
 
 
 def main():
@@ -13,51 +12,75 @@ def main():
         return
 
     serverIP = sys.argv[1]
-    serverUDPListenPort = sys.argv[2]
-    serverTCPListenPort = sys.argv[3]
-    clientUDPSenderPort = sys.argv[4]
-    clientTCPSenderPort = sys.argv[5]
-    TCP(serverIP, serverTCPListenPort)
+    UDPListenPort = sys.argv[2]
+    TCPListenPort = sys.argv[3]
+    UDPSenderPort = sys.argv[4]
+    TCPSenderPort = sys.argv[5]
+    TCP(serverIP, TCPListenPort, TCPSenderPort)
+    UDP(serverIP, UDPListenPort, UDPSenderPort)
 
 
-def UDP():
-    serverName = 'hostName'
-    serverPort = 12000
+def UDP(serverIP, UDPListenPort, UDPSenderPort):
+    serverName = serverIP
+    serverPort = int(UDPListenPort)
+    # read file into the variable f
+    # with -> no need to close/free (automatically handled)
+    with open("transfer_file_UDP.txt") as f:
+        whole = f.read()
+        
+    print(len(whole))
+    client_send_socket = socket(AF_INET, SOCK_DGRAM)
 
-    # create UDP socket for server
-    # soc_dgram -> datagram -> means UDP
-    clientSocket = socket(AF_INET, SOCK_DGRAM)
-    # for this application we send input from stdin
-    message = input('Input lowercase sentence:')
-    clientSocket.sendto(message.encode(), (serverName, serverPort))
-    # servername yo IP done in sendto by calling DNS
-    modifiedMessage, serverAddress = clientSocket.recvfrom(2048)
+    offset = 0
 
-    print(modifiedMessage.decode())
-    clientSocket.close()
+    while offset < len(whole):
+        message = whole[offset:offset + SEGMENT_SIZE]
+        offset += SEGMENT_SIZE
+        print("before sending...")
+        client_send_socket.sendto(message.encode(), (serverIP, serverPort))
+        print("after sending before receiving..")
+        modifiedMessage, serverAddress = client_send_socket.recvfrom(1024)
+        print("after receiving.")
+        print(modifiedMessage.encode())
+
+    client_send_socket.close()
     return
 
 
-def TCP(serverIP, serverPort):
-    # with open("transfer_file_TCP.txt", "rb") as f:
-    #     while bytearray := f.read(1000):
-    #         print(bytearray)
+def TCP(serverIP, serverPort, clientTCPSenderPort):
+    # read the file into the whole
+    with open("transfer_file_TCP.txt") as f:
+        whole = f.read()
 
     # TCP Client
-
     # AF_INET -> means IPv4
     # SOCK_STREAM -> means TCP
     clientSocket = socket(AF_INET, SOCK_STREAM)
+
     # handshaking
     serverPort = int(serverPort)
+
+    offset = 0
     clientSocket.connect((serverIP, serverPort))
-    sentence = input('Input lowercase sentence:')
-    # since connection is already established instead
-    # of sendto this time send
-    # send 10 bytearray
-    clientSocket.send(sentence.encode())
-    modifiedSentence = clientSocket.recv(1024)
-    print('From Server:', modifiedSentence.decode())
+    while offset < len(whole):  # there exists data to send
+        # data to be sent is smaller than te segment size
+        print("offset: ", offset)
+        print("len(whole): ", len(whole))
+        if offset + SEGMENT_SIZE > len(whole):
+            message = whole[offset:]
+        else:
+            message = whole[offset:offset+SEGMENT_SIZE]
+
+        offset = offset + SEGMENT_SIZE
+        # message to be sent
+        # SEGMENT_SIZE long
+        print("client sending..")
+        # send data to the server
+        byt = message.encode()
+        clientSocket.send(byt)
+        # if required, recv a message from the server
+
+    # file sent close connection
     clientSocket.close()
     return
 
